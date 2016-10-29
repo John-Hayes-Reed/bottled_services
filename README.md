@@ -18,7 +18,61 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Service Objects can be generated using the bottled_service generator:
+
+    $ rails g bottled_service ExampleService first_attribute:String second_attribute:Array
+
+This will then create a service object that can accept two type-strict attributes, this service can then be called and executed by calling the class call method:
+
+```ruby
+ExampleService.(first_attribute: 'This is a string.', second_attribute: ['This', 'is', 'an', 'Array'])
+```
+or :
+```ruby
+ExampleService.(some_valid_params)
+```
+
+Bottled Services provide the ability to create strict-type attributes, however this is not a definite, and in the case of wanting to use type agnostic attributes, just leave out the type from the command:
+
+    $ rails g bottled_service TypeAgnosticService first_attribute second_attribute
+
+when using the generator, the attribute arguments add:
+```ruby
+att :first_attribute, String
+att :second_attribute, Array
+```
+
+Into the service class which, tells the bottled service which attributes are acceptable, and the type for it. So when not using the generator, or when adding attributes later on, just add another line like the above to declare it.
+And for any type, just leave out the type:
+
+```ruby
+att :third_attribute
+```
+
+Afterwards just add the logic to your new service's call method, and your its ready to go:
+
+```ruby
+def call
+  puts "My first attribute: #{@first_attribute}"
+end
+```
+
+Bonus!
+
+When you generate the service you will notice in the auto-generated call method there is a yield statement:
+
+```ruby
+def call
+  # Do something...
+  yield if block_given?
+end
+```
+
+Bottled Services can accept blocks for those rare times when you want to run the service logic, but need a little something extra that you don't want to have to put in your controller logic, or have to write another service for, just pass the block in when initiating with the class call method, and it will be available to yield from your service instances call method:
+
+```ruby
+ExampleService.(some_valid_params){|first_att, second_att| puts "All the atts! #{first_att}, #{second_att}" }
+```
 
 ## Development
 
