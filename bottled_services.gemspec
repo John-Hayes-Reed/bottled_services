@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["john.hayes.reed@gmail.com"]
 
   spec.summary       = %q{A gourmet service object}
-  spec.description   = %q{This gem provides a module to provides a module as the base for all bottled services and a generator to easily create them.}
+  spec.description   = %q{This gem provides Class to be the base for services and a generator to easily create them.}
   spec.homepage      = "https://github.com/John-Hayes-Reed/bottled_services"
   spec.license       = "MIT"
 
