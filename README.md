@@ -49,7 +49,7 @@ And for any type, just leave out the type:
 att :third_attribute
 ```
 
-Afterwards just add the logic to your new service's call method, and your its ready to go:
+Afterwards just add the logic to your new service's call method, and its ready to go:
 
 ```ruby
 def call
