@@ -19,7 +19,7 @@ class BottledService
     if block_given?
       new(**atts).(&Proc.new)
     else
-      new(**atts)
+      new(**atts).()
     end
   end
 
