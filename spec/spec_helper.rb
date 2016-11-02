@@ -1,2 +1,2 @@
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
-require "bottled_service"
+require "bottled_services"

@@ -1,5 +1,3 @@
-require "bottled_service/version"
-
 class BottledService
   def self.att(att_key, type=nil)
     unless type.nil?

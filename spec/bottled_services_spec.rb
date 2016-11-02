@@ -29,7 +29,10 @@ describe BottledService do
     end
   end
 
+end
+
+describe BottledServices do
   it "has a version number" do
-    expect(BottledService::VERSION).not_to be nil
+    expect(BottledServices::VERSION).not_to be nil
   end
 end
