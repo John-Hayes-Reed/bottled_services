@@ -1,5 +1,10 @@
 # BottledServices
 
+## The best thing to happen since bottled water
+
+Ok, thats a drastic exaggeration, but now I have your attention lets get down to it.  
+bottled_services are here to make your life easier, its that simple. Using services keeps our code cleaner, DRYer, and reusable. With this gem creating and using services is now as easy and pain-free as can be thanks to the bottled_services generator and the BottledService Class from which all bottled services are children of, all you need to worry about is adding your business logic, let bottled_services handle the rest.
+
 ## Installation
 
 Add this line to your application's Gemfile:
