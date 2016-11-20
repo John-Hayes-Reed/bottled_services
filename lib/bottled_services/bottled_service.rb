@@ -2,7 +2,7 @@ class BottledService
   def self.att(att_key, type=nil)
     unless type.nil?
       define_method "#{att_key}=" do |value|
-        raise IllegalTypeError unless value.is_a?(type)
+        raise IllegalTypeError, "#{att_key} should be #{type} but is #{value.class}" unless value.is_a?(type)
         instance_variable_set "@#{att_key}", value
       end
     else
