@@ -22,15 +22,15 @@ class BottledServiceResponse
   # Shows if the response represents a successful execution.
   #
   # @return [true, false]
-  def success?
+  def succeeded?
     @response_success
   end
 
   # Shows if the response represents a failed execution.
   #
   # @return [true, false]
-  def fail?
-    !success?
+  def failed?
+    !succeeded?
   end
 
   # Outputs all attributes that the Response object holds.
