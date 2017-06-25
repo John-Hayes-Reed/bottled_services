@@ -1,31 +1,198 @@
-require "spec_helper"
+require 'spec_helper'
 
 describe BottledService do
-  subject(:service) { BottledService.new }
-  describe "::att" do
-    before { service.singleton_class.att :test_string, String }
-    before { service.singleton_class.att :test_array, Array }
-    it "responds to att set methods" do
-      expect(service).to respond_to(:test_string, :test_array, :test_string=, :test_array=)
-      expect(service).not_to respond_to(:a_non_set_method)
+  describe '::att' do
+    subject do
+      class FirstServiceObject
+        include BottledService
+
+        att :test_string, type: String, required: true
+        att :test_array, type: Array
+
+        def call
+          success
+        end
+      end
+      FirstServiceObject.new test_string: 'String', test_array: %i[foo bar]
+    end
+    it 'responds to att set methods' do
+      expect(subject.instance_eval { test_string }).to eq 'String'
+      expect(subject.instance_eval { test_array }).to eq %i[foo bar]
+      expect(subject.required_arguments).to include :test_string
+      expect(subject).not_to respond_to(:a_non_set_method)
     end
   end
-  subject(:service_class){ BottledService }
-  describe("#initialize") do
-    before { service_class.att :test_string, String }
-    before { service_class.att :test_array, Array }
-    before { service_class.att :test_type_agnostic }
-    before { service_class.att :test_type_agnostic_two }
-    it "sets attributes with variables of the correct type" do
-      expect(service_class.new({test_string: "Test String", test_array: [1,2,3]})).to be_a(BottledService)
+
+  describe('#initialize') do
+    subject do
+      class SecondServiceObject
+        include BottledService
+
+        att :test_string, type: String
+        att :test_array, type: Array
+        att :test_type_agnostic
+        att :test_type_agnostic_two
+
+        def call
+          success
+        end
+      end
+      SecondServiceObject
+    end
+    it 'sets attributes with variables of the correct type' do
+      expect(subject.new(test_string: 'Test String', test_array: [1, 2, 3])
+                    .class
+                    .ancestors)
+        .to include BottledService
     end
 
-    it "sets type agnostic attributes with any type variabe" do
-      expect(service_class.new({test_type_agnostic: "Test String", test_type_agnostic_two: [1,2,3]})).to be_a(BottledService)
+    it 'sets type agnostic attributes with any type variabe' do
+      expect(subject.new(test_type_agnostic: 'Test String',
+                         test_type_agnostic_two: [1, 2, 3]))
+        .to be_a BottledService
     end
 
-    it "throws an IllegalTypeError when setting an attibutes with a variable of an incorrect type" do
-      expect{service_class.new({test_string: [1,2,3], test_array: "Test String"})}.to raise_error(BottledService::IllegalTypeError)
+    it 'throws an IllegalTypeError when setting an attibutes with a variable of an incorrect type' do
+      expect do
+        subject.new(test_string: [1, 2, 3], test_array: 'Test String')
+      end
+        .to raise_error BottledServiceError::IllegalTypeError
+    end
+  end
+
+  describe('#call') do
+    subject do
+      class ThirdServiceObject
+        include BottledService
+
+        att :test_string, type: String
+        att :test_array, type: Array
+        att :test_type_agnostic
+        att :test_type_agnostic_two
+
+        def call
+          response = yield if block_given?
+
+          response ||= @test_string if @test_string
+          response ||= @test_type_agnostic if @test_type_agnostic
+
+          response
+        end
+      end
+      ThirdServiceObject
+    end
+    it 'sets attributes with variables of the correct type' do
+      expect(subject.call(test_string: 'Test String', test_array: [1, 2, 3]))
+        .to eq 'Test String'
+    end
+
+    it 'sets type agnostic attributes with any type variabe' do
+      expect(subject.call(test_type_agnostic: 'Test String',
+                          test_type_agnostic_two: [1, 2, 3]))
+        .to eq 'Test String'
+    end
+
+    it 'throws an IllegalTypeError when setting an attibutes with a variable of an incorrect type' do
+      expect do
+        subject.call(test_string: [1, 2, 3], test_array: 'Test String')
+      end
+        .to raise_error BottledServiceError::IllegalTypeError
+    end
+
+    it 'correctly yields a passed block' do
+      expect(subject.call(test_string: 'Test String') { @test_string = 'new' })
+        .to eq 'new'
+    end
+  end
+
+  describe '#verify_required_arguments' do
+    subject do
+      class FourthServiceObject
+        include BottledService
+
+        att :test_symbol, type: Symbol, required: true
+
+        def call
+          @test_symbol
+        end
+      end
+      FourthServiceObject
+    end
+
+    it do
+      expect(subject.call(test_symbol: :symbol))
+        .to eq :symbol
+    end
+
+    it do
+      expect { subject.call }
+        .to raise_error BottledServiceError::RequiredArgumentNotFound
+    end
+  end
+
+  describe '#success' do
+    subject do
+      class FifthServiceObject
+        include BottledService
+
+        att :test_symbol, type: Symbol, required: true
+
+        def call
+          success test_symbol: @test_symbol
+        end
+      end
+      FifthServiceObject
+    end
+    it do
+      expect(subject.call(test_symbol: :symbol)).to be_a BottledServiceResponse
+    end
+    it do
+      expect(subject.call(test_symbol: :symbol).succeeded?).to be_truthy
+    end
+    it do
+      expect(subject.call(test_symbol: :symbol).failed?).to be_falsey
+    end
+    it do
+      expect(subject.call(test_symbol: :symbol).keys).to include(:test_symbol)
+    end
+    it do
+      expect(subject.call(test_symbol: :symbol).values).to include(:symbol)
+    end
+    it do
+      expect(subject.call(test_symbol: :symbol).test_symbol).to eq :symbol
+    end
+  end
+
+  describe '#failure' do
+    subject do
+      class SixthServiceObject
+        include BottledService
+
+        att :test_symbol, type: Symbol, required: true
+
+        def call
+          failure test_symbol: @test_symbol
+        end
+      end
+      SixthServiceObject
+    end
+    it do
+      expect(subject.call(test_symbol: :symbol)).to be_a BottledServiceResponse
+    end
+    it do
+      expect(subject.call(test_symbol: :symbol).succeeded?).to be_falsey
+    end
+    it do
+      expect(subject.call(test_symbol: :symbol).failed?).to be_truthy
+    end
+    it do
+      expect(subject.call(test_symbol: :symbol).keys).to include(:test_symbol)
+    end
+    it do
+      expect(subject.call(test_symbol: :symbol).values).to include(:symbol)
+    end
+    it do
+      expect(subject.call(test_symbol: :symbol).test_symbol).to eq :symbol
     end
   end
 end
@@ -51,8 +218,8 @@ describe BottledServiceResponse do
     end
   end
 
-  describe '#success?' do
-    subject { BottledServiceResponse.new(success, atts).success? }
+  describe '#succeeded?' do
+    subject { BottledServiceResponse.new(success, atts).succeeded? }
     context 'for success' do
       let(:success) { true }
       it { is_expected.to be_truthy }
@@ -64,8 +231,8 @@ describe BottledServiceResponse do
     end
   end
 
-  describe '#fail?' do
-    subject { BottledServiceResponse.new(success, atts).fail? }
+  describe '#failed?' do
+    subject { BottledServiceResponse.new(success, atts).failed? }
     context 'for success' do
       let(:success) { true }
       it { is_expected.to be_falsey }
@@ -156,7 +323,7 @@ describe BottledServiceResponse do
 end
 
 describe BottledServices do
-  it "has a version number" do
+  it 'has a version number' do
     expect(BottledServices::VERSION).not_to be nil
   end
 end
