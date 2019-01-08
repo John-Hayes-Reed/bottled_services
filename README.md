@@ -1,5 +1,7 @@
 # BottledServices
 
+![](https://ruby-gem-downloads-badge.herokuapp.com/bottled_services?type=total)
+
 ## The best thing to happen since bottled water
 
 Ok, thats a drastic exaggeration, but now I have your attention lets get down to it.  
@@ -33,11 +35,11 @@ Service Objects can be generated using the bottled_service generator:
 This will then create a service object that can accept two type-strict attributes, this service can then be called and executed by calling the class call method:
 
 ```ruby
-ExampleService.(first_attribute: 'This is a string.', second_attribute: ['This', 'is', 'an', 'Array'])
+ExampleService.call(first_attribute: 'This is a string.', second_attribute: ['This', 'is', 'an', 'Array'])
 ```
 or :
 ```ruby
-ExampleService.(some_valid_params)
+ExampleService.call(some_valid_params)
 ```
 
 Bottled Services provide the ability to create strict-type attributes, however this is not a definite, and in the case of wanting to use type agnostic attributes, just leave out the type from the command:
@@ -79,7 +81,7 @@ end
 Bottled Services can accept blocks for those rare times when you want to run the service logic, but need a little something extra that you don't want to have to put in your controller logic, or have to write another service for, just pass the block in when initiating with the class call method, and it will be available to yield from your service instances call method:
 
 ```ruby
-ExampleService.(some_valid_params){|first_att, second_att| puts "All the atts! #{first_att}, #{second_att}" }
+ExampleService.call(some_valid_params){|first_att, second_att| puts "All the atts! #{first_att}, #{second_att}" }
 ```
 
 ## Development
