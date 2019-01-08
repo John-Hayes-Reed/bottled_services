@@ -42,7 +42,7 @@ or :
 ExampleService.call(some_valid_params)
 ```
 
-Bottled Services provide the ability to create strict-type attributes, however this is not a definite, and in the case of wanting to use type agnostic attributes, just leave out the type from the command:
+Bottled Services provide the ability to create strict-type attributes, however this is not a must, and in the case of wanting to use type agnostic attributes, just leave out the type from the command:
 
     $ rails g bottled_service TypeAgnosticService first_attribute second_attribute
 
