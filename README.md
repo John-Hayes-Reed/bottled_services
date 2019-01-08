@@ -46,14 +46,14 @@ Bottled Services provide the ability to create strict-type attributes, however t
 
     $ rails g bottled_service TypeAgnosticService first_attribute second_attribute
 
-when using the generator, the attribute arguments add:
+When using the generator with types, the attribute arguments will generate something like the following in your service object:
 ```ruby
 att :first_attribute, String
 att :second_attribute, Array
 ```
 
-Into the service class which, tells the bottled service which attributes are acceptable, and the type for it. So when not using the generator, or when adding attributes later on, just add another line like the above to declare it.
-And for any type, just leave out the type:
+This tells the bottled service which attributes are acceptable, and the type for it. So when not using the generator, or when adding attributes later on, just add another line as you like to declare it.
+And to allow any type, just leave out the type:
 
 ```ruby
 att :third_attribute
